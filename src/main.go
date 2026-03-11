@@ -6,7 +6,7 @@ import (
 )
 
 func main() {
-	bytes, err := os.ReadFile("./examples/00.lang")
+	bytes, err := os.ReadFile("./examples/01.lang")
 	if err != nil {
 		panic(err)
 	}
