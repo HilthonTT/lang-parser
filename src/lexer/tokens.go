@@ -92,13 +92,12 @@ var reserved_lu map[string]TokenKind = map[string]TokenKind{
 type Token struct {
 	Kind  TokenKind
 	Value string
+	Line  int
+	Col   int
 }
 
-func NewToken(kind TokenKind, value string) Token {
-	return Token{
-		Kind:  kind,
-		Value: value,
-	}
+func NewToken(kind TokenKind, value string, line, col int) Token {
+	return Token{Kind: kind, Value: value, Line: line, Col: col}
 }
 
 func (t Token) isOneOfMany(expectedTokens ...TokenKind) bool {

@@ -17,10 +17,20 @@ type lexer struct {
 	Tokens   []Token
 	source   string
 	pos      int
+	line     int
+	col      int
 }
 
 func (l *lexer) advanceN(n int) {
-	l.pos += n
+	for range n {
+		if l.pos < len(l.source) && l.source[l.pos] == '\n' {
+			l.line++
+			l.col = 0
+		} else {
+			l.col++
+		}
+		l.pos++
+	}
 }
 
 func (l *lexer) push(token Token) {
@@ -63,7 +73,7 @@ func Tokenize(source string) []Token {
 		}
 	}
 
-	lex.push(NewToken(EOF, "EOF"))
+	lex.push(NewToken(EOF, "EOF", lex.line, lex.col))
 
 	return lex.Tokens
 }
@@ -71,8 +81,8 @@ func Tokenize(source string) []Token {
 func defaultHandler(kind TokenKind, value string) regexHandler {
 	return func(lex *lexer, regexp *regexp.Regexp) {
 		// advance the lexer's position past the value we just reached
+		lex.push(NewToken(kind, value, lex.line, lex.col))
 		lex.advanceN(len(value))
-		lex.push(NewToken(kind, value))
 	}
 }
 
@@ -124,7 +134,7 @@ func createLexer(source string) *lexer {
 
 func numberHandler(lex *lexer, regex *regexp.Regexp) {
 	match := regex.FindString(lex.remainder())
-	lex.push(NewToken(NUMBER, match))
+	lex.push(NewToken(NUMBER, match, lex.line, lex.col))
 	lex.advanceN(len(match))
 }
 
@@ -137,7 +147,7 @@ func stringHandler(lex *lexer, regex *regexp.Regexp) {
 	match := regex.FindStringIndex(lex.remainder())
 	stringLiteral := lex.remainder()[match[0]+1 : match[1]-1] // +1 to and -1 to remove the quotes
 
-	lex.push(NewToken(STRING, stringLiteral))
+	lex.push(NewToken(STRING, stringLiteral, lex.line, lex.col))
 	lex.advanceN(len(stringLiteral) + 2) // +2 because we 'removed' the quotes of the string.
 }
 
@@ -145,9 +155,9 @@ func symbolHandler(lex *lexer, regex *regexp.Regexp) {
 	value := regex.FindString(lex.remainder())
 
 	if kind, exists := reserved_lu[value]; exists {
-		lex.push(NewToken(kind, value))
+		lex.push(NewToken(kind, value, lex.line, lex.col))
 	} else {
-		lex.push(NewToken(IDENTIFIER, value))
+		lex.push(NewToken(IDENTIFIER, value, lex.line, lex.col))
 	}
 
 	lex.advanceN(len(value))

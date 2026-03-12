@@ -18,17 +18,27 @@ func createParser(tokens []lexer.Token) *parser {
 	}
 }
 
-func Parse(tokens []lexer.Token) ast.BlockStmt {
-	body := make([]ast.Stmt, 0)
+func Parse(tokens []lexer.Token) (result ast.BlockStmt, err error) {
+	// Catch any SyntaxError panics and return them as normal errors.
+	defer func() {
+		if r := recover(); r != nil {
+			if syntaxErr, ok := r.(*SyntaxError); ok {
+				err = syntaxErr
+			} else {
+				// Re-panic for unexpected bugs — don't swallow real crashes.
+				panic(r)
+			}
+		}
+	}()
+
 	p := createParser(tokens)
+	body := make([]ast.Stmt, 0)
 
 	for p.hasTokens() {
 		body = append(body, parseStmt(p))
 	}
 
-	return ast.BlockStmt{
-		Body: body,
-	}
+	return ast.BlockStmt{Body: body}, nil
 }
 
 // HELPER METHODS
@@ -50,25 +60,17 @@ func (p *parser) hasTokens() bool {
 	return p.pos < len(p.tokens) && p.currentTokenKind() != lexer.EOF
 }
 
-func (p *parser) expectError(expectedKind lexer.TokenKind, err any) lexer.Token {
+func (p *parser) expectError(expectedKind lexer.TokenKind, msg string) lexer.Token {
 	token := p.currentToken()
-	kind := token.Kind
-
-	if kind != expectedKind {
-		if err == nil {
-			err = fmt.Sprintf(
-				"Expected %s but received %s instead.\n",
-				lexer.TokenKindString(expectedKind),
-				lexer.TokenKindString(kind),
-			)
+	if token.Kind != expectedKind {
+		if msg == "" {
+			msg = fmt.Sprintf("expected %s", lexer.TokenKindString(expectedKind))
 		}
-
-		panic(err)
+		panic(syntaxError(token, msg))
 	}
-
 	return p.advance()
 }
 
 func (p *parser) expect(expectedKind lexer.TokenKind) lexer.Token {
-	return p.expectError(expectedKind, nil)
+	return p.expectError(expectedKind, "")
 }

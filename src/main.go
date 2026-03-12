@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"lang-parser/src/lexer"
 	"lang-parser/src/parser"
 	"os"
@@ -11,12 +12,17 @@ import (
 func main() {
 	bytes, err := os.ReadFile("./examples/02.lang")
 	if err != nil {
-		panic(err)
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
 	}
 
 	source := string(bytes)
 	tokens := lexer.Tokenize(source)
 
-	ast := parser.Parse(tokens)
-	litter.Dump(ast)
+	tree, err := parser.Parse(tokens)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
+	litter.Dump(tree)
 }

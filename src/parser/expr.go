@@ -53,7 +53,7 @@ func parseExpr(p *parser, bp bindingPower) ast.Expr {
 	// Phase 1 — prefix/primary
 	nudFn, exists := nudTable[p.currentTokenKind()]
 	if !exists {
-		panic(fmt.Sprintf("expected an expression, got %s", lexer.TokenKindString(p.currentTokenKind())))
+		panic(syntaxError(p.currentToken(), "expected an expression"))
 	}
 
 	left := nudFn(p)
@@ -62,9 +62,8 @@ func parseExpr(p *parser, bp bindingPower) ast.Expr {
 	for bindingPowers[p.currentTokenKind()] > bp {
 		ledFn, exists := ledTable[p.currentTokenKind()]
 		if !exists {
-			panic(fmt.Sprintf("no infix handler for %s", lexer.TokenKindString(p.currentTokenKind())))
+			panic(syntaxError(p.currentToken(), "no infix handler for %s", lexer.TokenKindString(p.currentTokenKind())))
 		}
-
 		left = ledFn(p, left, bp)
 	}
 
