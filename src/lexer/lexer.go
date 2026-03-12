@@ -58,7 +58,6 @@ func Tokenize(source string) []Token {
 			}
 		}
 
-		// You could extend this to print the location and other things
 		if !matched {
 			panic(fmt.Sprintf("Lexer::Error -> unrecognized token near %s\n", lex.remainder()))
 		}
