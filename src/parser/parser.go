@@ -66,7 +66,7 @@ func (p *parser) expectError(expectedKind lexer.TokenKind, msg string) lexer.Tok
 		if msg == "" {
 			msg = fmt.Sprintf("expected %s", lexer.TokenKindString(expectedKind))
 		}
-		panic(syntaxError(token, msg))
+		panic(syntaxError(token, "%s", msg))
 	}
 	return p.advance()
 }

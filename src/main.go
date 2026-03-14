@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	bytes, err := os.ReadFile("./examples/02.lang")
+	bytes, err := os.ReadFile("./examples/03.lang")
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)

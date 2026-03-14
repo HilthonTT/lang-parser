@@ -79,4 +79,8 @@ func init() {
 	nud(lexer.NUMBER, parsePrimaryExpr)
 	nud(lexer.STRING, parsePrimaryExpr)
 	nud(lexer.IDENTIFIER, parsePrimaryExpr)
+
+	// Statements
+	stmt(lexer.CONST, parseVariableDeclarationStmt)
+	stmt(lexer.LET, parseVariableDeclarationStmt)
 }
