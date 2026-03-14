@@ -64,8 +64,36 @@ func parseExpr(p *parser, bp bindingPower) ast.Expr {
 		if !exists {
 			panic(syntaxError(p.currentToken(), "no infix handler for %s", lexer.TokenKindString(p.currentTokenKind())))
 		}
-		left = ledFn(p, left, bp)
+		left = ledFn(p, left, bindingPowers[p.currentTokenKind()])
 	}
 
 	return left
+}
+
+func parseAssignmentExpr(p *parser, left ast.Expr, bp bindingPower) ast.Expr {
+	operatorToken := p.advance()
+	rhs := parseExpr(p, bp)
+
+	return ast.AssignmentExpr{
+		Operator: operatorToken,
+		Value:    rhs,
+		Assignee: left,
+	}
+}
+
+func parsePrefixExpr(p *parser) ast.Expr {
+	operatorToken := p.advance()
+	rhs := parseExpr(p, defaultBP)
+
+	return ast.PrefixExpr{
+		Operator:  operatorToken,
+		RightExpr: rhs,
+	}
+}
+
+func parseGroupingExpr(p *parser) ast.Expr {
+	p.advance() // Advance pass grouping start
+	expr := parseExpr(p, defaultBP)
+	p.expect(lexer.CLOSE_PAREN) // advance past close
+	return expr
 }

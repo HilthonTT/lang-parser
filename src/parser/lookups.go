@@ -45,7 +45,6 @@ func led(kind lexer.TokenKind, bp bindingPower, handler ledHandler) {
 }
 
 func nud(kind lexer.TokenKind, handler nudHandler) {
-	bindingPowers[kind] = primary
 	nudTable[kind] = handler
 }
 
@@ -55,6 +54,11 @@ func stmt(kind lexer.TokenKind, handler stmtHandler) {
 }
 
 func init() {
+	led(lexer.ASSIGNMENT, assignment, parseAssignmentExpr)
+	led(lexer.PLUS_EQUALS, assignment, parseAssignmentExpr)
+	led(lexer.MINUS_EQUALS, assignment, parseAssignmentExpr)
+	// TODO: Add *= /= %=
+
 	// Logical
 	led(lexer.AND, logical, parseBinaryExpr)
 	led(lexer.OR, logical, parseBinaryExpr)
@@ -79,6 +83,8 @@ func init() {
 	nud(lexer.NUMBER, parsePrimaryExpr)
 	nud(lexer.STRING, parsePrimaryExpr)
 	nud(lexer.IDENTIFIER, parsePrimaryExpr)
+	nud(lexer.OPEN_PAREN, parseGroupingExpr)
+	nud(lexer.DASH, parsePrefixExpr)
 
 	// Statements
 	stmt(lexer.CONST, parseVariableDeclarationStmt)
