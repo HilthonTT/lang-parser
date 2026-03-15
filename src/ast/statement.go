@@ -22,7 +22,7 @@ type VariableDeclarationStmt struct {
 	VariableName  string
 	IsConstant    bool
 	AssignedValue Expr
-	// ExplicitType Type
+	ExplicitType  Type
 }
 
 func (VariableDeclarationStmt) stmtNode() {}

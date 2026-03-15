@@ -1,7 +1,7 @@
-let foo = -45.5;
 let bar = foo * 10 + (45 / 10 - -5);
+const foo: number = 1;
 
-foo = foo + 10;
-foo += 10;
+let foo: number;
+let numbers: []number;
 
-const isGreater = foo > 10;
+bar = "Hello world";

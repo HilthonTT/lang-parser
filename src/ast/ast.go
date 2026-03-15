@@ -11,3 +11,7 @@ type Stmt interface {
 type Expr interface {
 	exprNode()
 }
+
+type Type interface {
+	_type()
+}
