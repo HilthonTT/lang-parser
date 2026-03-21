@@ -26,3 +26,22 @@ type VariableDeclarationStmt struct {
 }
 
 func (VariableDeclarationStmt) stmtNode() {}
+
+type StructProperty struct {
+	IsStatic bool // determine whether the property is static
+	Type     Type
+}
+
+type StructMethod struct {
+	IsStatic bool
+	// Type     FnType
+}
+
+type StructDeclarationStmt struct {
+	StructName string
+	// IsPublic   bool
+	Properties map[string]StructProperty
+	Methods    map[string]StructMethod
+}
+
+func (StructDeclarationStmt) stmtNode() {}

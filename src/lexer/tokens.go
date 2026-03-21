@@ -69,6 +69,8 @@ const (
 	EXPORT
 	TYPEOF
 	IN
+	STRUCT
+	STATIC
 )
 
 var reserved_lu map[string]TokenKind = map[string]TokenKind{
@@ -87,6 +89,8 @@ var reserved_lu map[string]TokenKind = map[string]TokenKind{
 	"export":  EXPORT,
 	"typeof":  TYPEOF,
 	"in":      IN,
+	"struct":  STRUCT,
+	"static":  STATIC,
 }
 
 type Token struct {
@@ -212,6 +216,10 @@ func TokenKindString(kind TokenKind) string {
 		return "export"
 	case IN:
 		return "in"
+	case STRUCT:
+		return "struct"
+	case STATIC:
+		return "static"
 	default:
 		return fmt.Sprintf("unknown(%d)", kind)
 	}

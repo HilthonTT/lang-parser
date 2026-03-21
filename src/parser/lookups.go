@@ -86,7 +86,12 @@ func init() {
 	nud(lexer.OPEN_PAREN, parseGroupingExpr)
 	nud(lexer.DASH, parsePrefixExpr)
 
+	// Call/Member/Arrays expressions
+	led(lexer.OPEN_CURLY, call, parseStructInstatiationExpr)
+	nud(lexer.OPEN_BRACKET, parseArrayLiteral)
+
 	// Statements
 	stmt(lexer.CONST, parseVariableDeclarationStmt)
 	stmt(lexer.LET, parseVariableDeclarationStmt)
+	stmt(lexer.STRUCT, parseStructDeclarationStmt)
 }

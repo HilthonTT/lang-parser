@@ -25,7 +25,7 @@ func typeNud(kind lexer.TokenKind, handler typeNudHandler) {
 
 func init() {
 	typeNud(lexer.IDENTIFIER, parseSymbolType)
-	typeNud(lexer.OPEN_BRACKET, parseArrayType)
+	typeLed(lexer.OPEN_BRACKET, call, parseArrayType)
 }
 
 func parseSymbolType(p *parser) ast.Type {
@@ -34,13 +34,12 @@ func parseSymbolType(p *parser) ast.Type {
 	}
 }
 
-func parseArrayType(p *parser) ast.Type {
-	p.advance()
+func parseArrayType(p *parser, left ast.Type, bp bindingPower) ast.Type {
+	p.expect(lexer.OPEN_BRACKET)
 	p.expect(lexer.CLOSE_BRACKET)
 
-	underlyingType := parseType(p, defaultBP)
 	return ast.ArrayType{
-		Underlying: underlyingType,
+		Underlying: left,
 	}
 }
 

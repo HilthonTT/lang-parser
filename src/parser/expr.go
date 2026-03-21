@@ -3,6 +3,7 @@ package parser
 import (
 	"fmt"
 	"lang-parser/src/ast"
+	"lang-parser/src/helpers"
 	"lang-parser/src/lexer"
 	"strconv"
 )
@@ -96,4 +97,56 @@ func parseGroupingExpr(p *parser) ast.Expr {
 	expr := parseExpr(p, defaultBP)
 	p.expect(lexer.CLOSE_PAREN) // advance past close
 	return expr
+}
+
+func parseStructInstatiationExpr(p *parser, left ast.Expr, bp bindingPower) ast.Expr {
+	structName := helpers.ExpectType[ast.SymbolExpr](left).Value
+	properties := map[string]ast.Expr{}
+
+	p.expect(lexer.OPEN_CURLY)
+
+	for p.hasTokens() && p.currentTokenKind() != lexer.CLOSE_CURLY {
+		propertyName := p.expect(lexer.IDENTIFIER).Value
+		p.expect(lexer.COLON)
+
+		expr := parseExpr(p, logical)
+		properties[propertyName] = expr
+
+		if p.currentTokenKind() != lexer.CLOSE_CURLY {
+			p.expect(lexer.COMMA)
+		}
+	}
+
+	p.expect(lexer.CLOSE_CURLY)
+
+	return ast.StructInstatiationExpr{
+		StructName: structName,
+		Properties: properties,
+	}
+}
+
+func parseArrayLiteral(p *parser) ast.Expr {
+	var underlyingType ast.Type
+	contents := []ast.Expr{}
+
+	p.expect(lexer.OPEN_BRACKET)
+	p.expect(lexer.CLOSE_BRACKET)
+	// If you want to have sizes here then you will need to handle that instead.
+
+	underlyingType = parseType(p, defaultBP)
+
+	p.expect(lexer.OPEN_CURLY)
+	for p.hasTokens() && p.currentTokenKind() != lexer.CLOSE_CURLY {
+		contents = append(contents, parseExpr(p, logical))
+
+		if p.currentTokenKind() != lexer.CLOSE_CURLY {
+			p.expect(lexer.COMMA)
+		}
+	}
+	p.expect(lexer.CLOSE_CURLY)
+
+	return ast.ArrayLiteralExpr{
+		Underlying: underlyingType,
+		Contents:   contents,
+	}
 }

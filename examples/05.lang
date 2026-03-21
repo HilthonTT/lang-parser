@@ -1,0 +1,14 @@
+// Declaration
+struct Rect {
+    static width: number;
+    height: number;
+}
+
+const square = Rect{
+    width: Foo{
+        bar: "This is a test",
+    },
+    height: 10,
+};
+
+const numbers = []number{1, 2, 3, 3 * 3, };
